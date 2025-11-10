@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - AI Academic System</title>
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #3498db 0%, #2c3e50 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .login-container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25); /* Increased Elevation */
+            width: 350px;
+            text-align: center;
+        }
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 25px;
+            font-size: 1.8em;
+        }
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 10px 10px 10px 40px; /* Space for icon */
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+        .input-group input:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+        .input-icon {
+            position: absolute;
+            padding: 10px;
+            color: #95a5a6;
+        }
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .input-wrapper .input-icon {
+            position: absolute;
+            left: 0;
+            padding: 10px;
+        }
+        .login-button {
+            background-color: #2ecc71;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1.1em;
+            width: 100%;
+            transition: background-color 0.3s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Button Elevation */
+        }
+        .login-button:hover {
+            background-color: #27ae60;
+        }
+        #loginMessage {
+            margin-top: 15px;
+            color: #e74c3c;
+            font-weight: 600;
+        }
+        .mock-credentials {
+            margin-top: 25px;
+            padding: 10px;
+            background-color: #ecf0f1;
+            border-radius: 6px;
+            font-size: 0.9em;
+            text-align: left;
+        }
+        .mock-credentials p {
+            margin: 5px 0;
+        }
+        .mock-credentials strong {
+            color: #3498db;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h2><i class="fas fa-lock"></i> System Login</h2>
+        <div class="input-group">
+            <label for="username">Username (Email)</label>
+            <div class="input-wrapper">
+                <i class="fas fa-envelope input-icon"></i>
+                <input type="text" id="username" placeholder="Enter email" required style="padding-left: 40px;">
+            </div>
+        </div>
+        <div class="input-group">
+            <label for="password">Password</label>
+            <div class="input-wrapper">
+                <i class="fas fa-key input-icon"></i>
+                <input type="password" id="password" placeholder="Enter password" required style="padding-left: 40px;">
+            </div>
+        </div>
+        <button class="login-button" onclick="handleLogin()">Login</button>
+        <div id="loginMessage"></div>
+        
+        <div class="mock-credentials">
+            <p><strong>Teacher Credentials (Mock):</strong></p>
+            <p>Username: <strong>danushkumar@gmail.com</strong></p>
+            <p>Password: <strong>admin@123</strong></p>
+            <hr style="border-color: #bdc3c7; border-style: dashed;">
+            <p><strong>Student Credentials (Mock):</strong></p>
+            <p>Username: <strong>S001</strong></p>
+            <p>Password: <strong>student@123</strong></p>
+        </div>
+    </div>
+
+    <script>
+        const BASE_URL = ''; 
+
+        async function handleLogin() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const messageElement = document.getElementById('loginMessage');
+            
+            messageElement.textContent = 'Logging in...';
+            messageElement.style.color = '#3498db';
+
+            try {
+                const response = await fetch(`${BASE_URL}/auth`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    messageElement.textContent = result.message;
+                    messageElement.style.color = '#2ecc71';
+                    
+                    // Redirect based on the user's role
+                    if (result.user_role === 'teacher') {
+                        window.location.href = '/dashboard';
+                    } else if (result.user_role === 'student') {
+                        window.location.href = '/student_dashboard';
+                    }
+                } else {
+                    messageElement.textContent = result.message || 'Login failed.';
+                    messageElement.style.color = '#e74c3c';
+                }
+            } catch (error) {
+                messageElement.textContent = "Network error. Server may be down.";
+                messageElement.style.color = '#e74c3c';
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard - AceExam</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f7f6;
+            color: #333;
+        }
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        h1, h2 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .logout-button {
+            background-color: #e74c3c;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            float: right;
+            text-decoration: none;
+        }
+        .card {
+            background: #ecf0f1;
+            border-left: 5px solid #3498db;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+        }
+        .card h3 { margin-top: 0; }
+        .card .meta { color: #7f8c8d; font-size: 0.9em; }
+        .card .status-graded { color: #2ecc71; font-weight: bold; }
+        .card .status-pending { color: #e67e22; font-weight: bold; }
+        .card .reminder { color: #c0392b; font-style: italic; }
+        .card .status-submitted { color: #3498db; font-weight: bold; }
+        .upload-form { margin-top: 10px; }
+        .upload-form input { padding: 8px; border-radius: 4px; border: 1px solid #ccc; margin-right: 5px; }
+        .upload-form button { background: #2ecc71; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; }
+
+        .marks-card {
+            border-left-color: #9b59b6;
+        }
+        .marks-card .score { font-size: 1.5em; font-weight: bold; color: #8e44ad; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/" class="logout-button">Logout</a>
+        <h1>AceExam - Student Dashboard</h1>
+        <p>Welcome, {{ user.name }}! Here are your assignments and marks.</p>
+
+        <h2>My Assignments</h2>
+        {% for assignment in assignments %}
+            <div class="card">
+                <h3>{{ assignment.title }}</h3>
+                <p>{{ assignment.description }}</p>
+                <p class="meta">Deadline: {{ assignment.deadline }} | Status: 
+                    <span class="{{ 'status-graded' if assignment.status == 'Graded' else 'status-submitted' if 'Submitted' in assignment.status else 'status-pending' }}">
+                        {{ assignment.status }}
+                    </span>
+                </p>
+                {% if assignment.reminder %}
+                    <p class="reminder">{{ assignment.reminder }}</p>
+                {% endif %}
+
+                {% if assignment.status != 'Graded' and  'Submitted' not in assignment.status %}
+                <div class="upload-form">
+                    <p><strong>Submit Your Work</strong></p>
+                    <form action="/student/submit_assignment" method="POST" enctype="multipart/form-data">
+                        <input type="hidden" name="assignment_id" value="{{ assignment.id }}">
+                        <input type="file" name="assignment_file" accept="image/*,application/pdf" required>
+                        <button type="submit">Upload & Submit</button>
+                    </form>
+                </div>
+                {% endif %}
+            </div>
+        {% endfor %}
+
+        <h2>My Marks</h2>
+        {% for mark in marks %}
+            <div class="card marks-card">
+                <h3>{{ mark.assignment_title }}</h3>
+                <p><strong>Feedback:</strong> {{ mark.feedback }}</p>
+                <p class="meta">Evaluated on: {{ mark.evaluated_at }}</p>
+                <p class="score">Score: {{ mark.score }} / {{ mark.max_score }}</p>
+            </div>
+        {% else %}
+            <p>You have no marks yet.</p>
+        {% endfor %}
+    </div>
+
+</body>
+</html>
